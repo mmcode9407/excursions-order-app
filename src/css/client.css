@@ -96,14 +96,85 @@ h1 {
 }
 
 .panel__form {
+	align-self: flex-start;
 	background-color: #f4f4f4;
 	padding: 20px;
 	width: 30%;
 }
 
-.uploader,
 .order {
 	border-bottom: 1px solid #bbb;
 	margin-bottom: 20px;
 	padding-bottom: 20px;
+}
+
+.summary__item {
+	margin-bottom: 10px;
+	border-bottom: 1px solid #000;
+}
+
+.summary__title {
+	display: flex;
+	/* justify-content: space-between; */
+	align-items: center;
+	gap: 5px;
+}
+
+.summary__total-price {
+	flex-grow: 1;
+}
+
+.summary__btn-remove {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 30px;
+	height: 30px;
+	text-decoration: none;
+	font-weight: 700;
+	border-radius: 50%;
+	background-color: #2e2e2e;
+	color: #fff;
+	transition: background-color 0.3s linear;
+}
+
+.summary__btn-remove:hover {
+	background-color: #4b4a4a;
+}
+
+.panel__order {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.order__total-price-value {
+	font-weight: 700;
+}
+
+.order__field-input {
+	display: block;
+	width: 100%;
+	padding: 5px;
+}
+
+.order__field-errors {
+	font-size: 12px;
+	color: #e00707;
+}
+
+.order__field-submit {
+	width: 100%;
+	padding: 10px 0;
+	background-color: #2e2e2e;
+	color: #fff;
+	font-weight: 700;
+	border-radius: 4px;
+	text-transform: uppercase;
+	transition: background-color 0.3s linear;
+	cursor: pointer;
+}
+
+.order__field-submit:hover {
+	background-color: #4b4a4a;
 }
