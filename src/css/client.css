@@ -4,8 +4,19 @@
 	box-sizing: border-box;
 }
 
+body {
+	font-family: 'Montserrat', sans-serif;
+	background-color: #2e2e2e;
+}
+
 ul {
 	list-style: none;
+}
+
+h1 {
+	margin: 30px 0;
+	color: #fff;
+	text-align: center;
 }
 
 .panel {
@@ -15,8 +26,9 @@ ul {
 	padding: 30px 0;
 }
 
-.panel__excursins {
+.panel__excursions {
 	width: 70%;
+	color: #fff;
 }
 
 .excursions {
@@ -25,11 +37,62 @@ ul {
 }
 
 .excursions__item {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	gap: 15px;
 	border: 1px solid #bbb;
 	border-radius: 5px;
 	margin: 10px;
 	padding: 20px;
 	width: calc(50% - 20px);
+}
+
+.excursions__title {
+	margin-bottom: 10px;
+}
+
+.excursions__form {
+	display: flex;
+	flex-direction: column;
+	gap: 15px;
+}
+
+.excursions__price {
+	margin: 0 5px;
+	font-weight: 700;
+}
+
+.excursions__field-name {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+}
+
+.excursions__field-title {
+	width: 150px;
+}
+
+.excursions__field-input {
+	padding: 5px;
+	min-width: 50%;
+}
+
+.excursions__field-input--submit {
+	width: 100%;
+	padding: 10px 0;
+	text-transform: uppercase;
+	color: #fff;
+	background-color: #44bd32;
+	border-radius: 4px;
+	border: none;
+	transition: background-color 0.3s linear;
+	cursor: pointer;
+}
+
+.excursions__field-input--submit:hover {
+	background-color: #50a043;
 }
 
 .panel__form {
