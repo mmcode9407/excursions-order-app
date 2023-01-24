@@ -21,6 +21,16 @@ class ExcursionsAPI {
 		return this._fetch(options, `/${id}`);
 	}
 
+	updateData(data, id) {
+		const options = {
+			method: 'PUT',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' },
+		};
+
+		return this._fetch(options, `/${id}`);
+	}
+
 	_fetch(options, additionalPath = '') {
 		const API_URL = `${this.API_LINK}${additionalPath}`;
 		return fetch(API_URL, options).then((resp) => {
