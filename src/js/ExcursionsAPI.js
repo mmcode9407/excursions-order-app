@@ -7,6 +7,15 @@ class ExcursionsAPI {
 		return this._fetch();
 	}
 
+	addData(data) {
+		const options = {
+			method: 'POST',
+			body: JSON.stringify(data),
+			headers: { 'Content-Type': 'application/json' },
+		};
+		return this._fetch(options);
+	}
+
 	removeData(id) {
 		const options = { method: 'DELETE' };
 		return this._fetch(options, `/${id}`);
