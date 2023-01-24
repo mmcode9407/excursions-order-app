@@ -7,6 +7,11 @@ class ExcursionsAPI {
 		return this._fetch();
 	}
 
+	removeData(id) {
+		const options = { method: 'DELETE' };
+		return this._fetch(options, `/${id}`);
+	}
+
 	_fetch(options, additionalPath = '') {
 		const API_URL = `${this.API_LINK}${additionalPath}`;
 		return fetch(API_URL, options).then((resp) => {
