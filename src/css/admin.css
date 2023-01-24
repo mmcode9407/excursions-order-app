@@ -67,7 +67,7 @@ h1 {
 	display: flex;
 	align-items: center;
 	flex-wrap: wrap;
-	gap: 10px;
+	gap: 5px;
 }
 
 .excursions__field-title {
@@ -80,7 +80,8 @@ h1 {
 	gap: 10px;
 }
 
-.excursions__field--submit .excursions__field-input {
+.excursions__field-input,
+.order__field-input {
 	width: 100%;
 	padding: 10px 0;
 	text-transform: uppercase;
@@ -92,14 +93,28 @@ h1 {
 	cursor: pointer;
 }
 
-.excursions__field--submit .excursions__field-input:hover {
+.excursions__field-input:hover,
+.order__field-input:hover {
 	background-color: #50a043;
 }
 
 .panel__form {
-	background-color: #f4f4f4;
-	padding: 20px;
+	align-self: flex-start;
 	width: 30%;
+	padding: 20px;
+	background-color: #f4f4f4;
+	border-radius: 8px;
+}
+
+.form {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.form__label {
+	display: flex;
+	flex-direction: column;
 }
 
 .uploader,
@@ -111,8 +126,14 @@ h1 {
 
 .form__field {
 	display: block;
+	padding: 4px;
 }
 
 .form__field--longtext {
 	height: 100px;
+	resize: vertical;
 }
+
+/* .excursions__item--prototype {
+	display: none;
+} */

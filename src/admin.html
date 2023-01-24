@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html lang="pl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>JavaScript: API oraz FETCH - admin, devmentor.pl</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <h1>Panel administratora</h1>
     <section class="panel">
@@ -13,7 +18,8 @@
             <li data-id="1" class="excursions__item excursions__item--prototype">
                 <header class="excursions__header">
                     <h2 class="excursions__title">Ogrodzieniec</h2>
-                    <p class="excursions__description">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet aliquam quam laboriosam quaerat temporibus dicta vitae maxime! Nemo, nobis veritatis?</p>
+                    <p class="excursions__description">Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet
+                        aliquam quam laboriosam quaerat temporibus dicta vitae maxime! Nemo, nobis veritatis?</p>
                 </header>
                 <form class="excursions__form">
                     <div class="excursions__field">
@@ -27,21 +33,15 @@
                         </label>
                     </div>
                     <div class="excursions__field excursions__field--submit">
-                        <input 
-                            class="excursions__field-input excursions__field-input--update" 
-                            value="edytuj"
-                            type="submit"
-                        />
-                        <input 
-                            class="excursions__field-input excursions__field-input--remove" 
-                            value="usuń"
-                            type="submit"
-                        />
+                        <input class="excursions__field-input excursions__field-input--update" value="edytuj"
+                            type="submit" />
+                        <input class="excursions__field-input excursions__field-input--remove" value="usuń"
+                            type="submit" />
                     </div>
                 </form>
             </li>
         </ul>
-        <section>
+        <section class="panel__form">
             <form class="form" novalidate>
                 <div class="form__row">
                     <label class="form__label">
@@ -60,20 +60,17 @@
                 </div>
                 <div class="form__row">
                     <label class="form__label">
-                        Cena dziecko:<input class="order__form__field" type="number" name="name" />
+                        Cena dziecko:<input class="form__field" type="number" name="name" />
                     </label>
                 </div>
                 <div class="order__field order__field--submit">
-                    <input 
-                        class="order__field-input order__field-submit" 
-                        value="dodaj"
-                        type="submit"
-                    />
+                    <input class="order__field-input order__field-submit" value="dodaj" type="submit" />
                 </div>
             </form>
-           
+
         </section>
     </section>
 
 </body>
+
 </html>
