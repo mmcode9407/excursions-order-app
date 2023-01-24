@@ -100,6 +100,7 @@ h1 {
 	background-color: #f4f4f4;
 	padding: 20px;
 	width: 30%;
+	border-radius: 8px;
 }
 
 .order {
@@ -115,7 +116,6 @@ h1 {
 
 .summary__title {
 	display: flex;
-	/* justify-content: space-between; */
 	align-items: center;
 	gap: 5px;
 }
@@ -177,4 +177,9 @@ h1 {
 
 .order__field-submit:hover {
 	background-color: #4b4a4a;
+}
+
+.excursions__item--prototype,
+.summary__item--prototype {
+	display: none;
 }
