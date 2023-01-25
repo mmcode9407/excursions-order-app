@@ -98,6 +98,16 @@ h1 {
 	background-color: #50a043;
 }
 
+.excursions__title,
+.excursions__description,
+.excursions__field-price {
+	border: 1px solid transparent;
+}
+
+.editable {
+	border: 1px solid #e74c3c;
+}
+
 .panel__form {
 	align-self: flex-start;
 	width: 30%;

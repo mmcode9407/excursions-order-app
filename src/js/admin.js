@@ -10,6 +10,7 @@ const init = () => {
 	load();
 	remove();
 	add();
+	update();
 };
 
 const load = () => {
@@ -61,6 +62,58 @@ const add = () => {
 				});
 		} else {
 			alert('Pola nie mogą być puste');
+		}
+	});
+};
+
+const update = () => {
+	ul.addEventListener('click', (e) => {
+		e.preventDefault();
+		if (e.target.value === 'edytuj' || e.target.value === 'zapisz') {
+			const parentElement = e.target.parentElement.parentElement.parentElement;
+			const excTitle = parentElement.querySelector('.excursions__title');
+			const excDescription = parentElement.querySelector(
+				'.excursions__description'
+			);
+			const adultPrice = parentElement.querySelector(
+				'.excursions__field-price--adult'
+			);
+			const childPrice = parentElement.querySelector(
+				'.excursions__field-price--child'
+			);
+			const elementsToUpdate = [
+				excTitle,
+				excDescription,
+				adultPrice,
+				childPrice,
+			];
+			const isEditable = elementsToUpdate.every((el) => el.isContentEditable);
+
+			if (isEditable) {
+				const id = parentElement.dataset.id;
+				const data = {
+					name: elementsToUpdate[0].innerText,
+					description: elementsToUpdate[1].innerText,
+					adultPrice: elementsToUpdate[2].innerText,
+					childPrice: elementsToUpdate[3].innerText,
+				};
+				api
+					.updateData(data, id)
+					.catch((err) => console.error(err))
+					.finally(() => {
+						e.target.value = 'edytuj';
+						elementsToUpdate.forEach((el) => {
+							el.contentEditable = false;
+							el.classList.remove('editable');
+						});
+					});
+			} else {
+				e.target.value = 'zapisz';
+				elementsToUpdate.forEach((el) => {
+					el.contentEditable = true;
+					el.classList.add('editable');
+				});
+			}
 		}
 	});
 };
