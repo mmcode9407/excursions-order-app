@@ -4,7 +4,8 @@ import ExcursionsAPI from './ExcursionsAPI';
 
 const API_EXC = new ExcursionsAPI('excursions');
 const API_ORDERS = new ExcursionsAPI('orders');
-const proto = document.querySelector('.excursions__item--prototype');
+const excProto = document.querySelector('.excursions__item--prototype');
+const sumProto = document.querySelector('.summary__item--prototype');
 let cart = [];
 
 const init = () => {
@@ -26,6 +27,7 @@ const addToCart = () => {
 		e.preventDefault();
 		const targetEl = e.target;
 		const parentEl = targetEl.parentElement;
+		const summaryUlList = document.querySelector('.panel__summary');
 		const [title, , adultPrice, childPrice] = getLiItems(parentEl);
 		const [adultQTY, childQTY] = targetEl.elements;
 
@@ -44,6 +46,26 @@ const addToCart = () => {
 			};
 
 			cart.push(basketData);
+			clearElement(summaryUlList);
+			cart.forEach((item) => {
+				const newSumLiItem = createElementFromSumProto();
+
+				const summaryName = newSumLiItem.querySelector('.summary__name');
+				const summaryPrice = newSumLiItem.querySelector(
+					'.summary__total-price'
+				);
+				const summaryDescription =
+					newSumLiItem.querySelector('.summary__prices');
+				summaryName.innerText = item.title;
+				summaryPrice.innerText = `${
+					item.adultNumber * item.adultPrice +
+					item.childNumber * item.childPrice
+				}PLN`;
+
+				summaryDescription.innerText = `dorośli: ${item.adultNumber} x ${item.adultPrice}PLN, dzieci: ${item.childNumber} x ${item.childPrice}PLN`;
+
+				summaryUlList.appendChild(newSumLiItem);
+			});
 		} else {
 			alert('Podaj ilość osób...');
 		}
@@ -66,7 +88,7 @@ const insertData = (excArray) => {
 };
 
 const createListEl = (itemData) => {
-	const newLiItem = createElementFromProto();
+	const newLiItem = createElementFromExcProto();
 	const [title, description, adultPrice, childPrice] = getLiItems(newLiItem);
 
 	title.innerText = itemData.name;
@@ -78,9 +100,15 @@ const createListEl = (itemData) => {
 	return newLiItem;
 };
 
-const createElementFromProto = () => {
-	const newElement = proto.cloneNode(true);
+const createElementFromExcProto = () => {
+	const newElement = excProto.cloneNode(true);
 	newElement.classList.remove('excursions__item--prototype');
+
+	return newElement;
+};
+const createElementFromSumProto = () => {
+	const newElement = sumProto.cloneNode(true);
+	newElement.classList.remove('summary__item--prototype');
 
 	return newElement;
 };
