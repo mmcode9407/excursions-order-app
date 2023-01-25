@@ -3,7 +3,6 @@ import './../css/admin.css';
 import ExcursionsAPI from './ExcursionsAPI';
 
 const api = new ExcursionsAPI('excursions');
-const ul = document.querySelector('.panel__excursions');
 const proto = document.querySelector('.excursions__item--prototype');
 
 const init = () => {
@@ -23,10 +22,12 @@ const load = () => {
 };
 
 const remove = () => {
-	ul.addEventListener('click', (e) => {
+	const ulElement = findRootElement();
+	ulElement.addEventListener('click', (e) => {
 		e.preventDefault();
-		if (e.target.value === 'usuń') {
-			const id = e.target.parentElement.parentElement.parentElement.dataset.id;
+		const targetEl = e.target;
+		if (isElementValue(targetEl, 'usuń')) {
+			const id = getIdFromRoot(targetEl);
 			api
 				.removeData(id)
 				.catch((err) => console.error(err))
@@ -42,10 +43,10 @@ const add = () => {
 		const { name, description, adultPrice, childPrice } = e.target.elements;
 
 		if (
-			name.value !== '' &&
-			description.value !== '' &&
-			adultPrice.value !== '' &&
-			childPrice.value !== ''
+			!isElementValue(name, '') &&
+			!isElementValue(description, '') &&
+			!isElementValue(adultPrice, '') &&
+			!isElementValue(childPrice, '')
 		) {
 			const data = {
 				name: name.value,
@@ -61,87 +62,129 @@ const add = () => {
 					e.target.reset();
 				});
 		} else {
-			alert('Pola nie mogą być puste');
+			alert('Pola nie mogą być puste...');
 		}
 	});
 };
 
 const update = () => {
-	ul.addEventListener('click', (e) => {
+	const ulElement = findRootElement();
+	ulElement.addEventListener('click', (e) => {
 		e.preventDefault();
-		if (e.target.value === 'edytuj' || e.target.value === 'zapisz') {
-			const parentElement = e.target.parentElement.parentElement.parentElement;
-			const excTitle = parentElement.querySelector('.excursions__title');
-			const excDescription = parentElement.querySelector(
-				'.excursions__description'
-			);
-			const adultPrice = parentElement.querySelector(
-				'.excursions__field-price--adult'
-			);
-			const childPrice = parentElement.querySelector(
-				'.excursions__field-price--child'
-			);
-			const elementsToUpdate = [
-				excTitle,
-				excDescription,
-				adultPrice,
-				childPrice,
-			];
-			const isEditable = elementsToUpdate.every((el) => el.isContentEditable);
-
-			if (isEditable) {
-				const id = parentElement.dataset.id;
-				const data = {
-					name: elementsToUpdate[0].innerText,
-					description: elementsToUpdate[1].innerText,
-					adultPrice: elementsToUpdate[2].innerText,
-					childPrice: elementsToUpdate[3].innerText,
-				};
+		const targetEl = e.target;
+		if (
+			isElementValue(targetEl, 'edytuj') ||
+			isElementValue(targetEl, 'zapisz')
+		) {
+			if (isItemEditable(targetEl)) {
+				const id = getIdFromRoot(targetEl);
+				const data = createDataToUpdate(targetEl);
 				api
 					.updateData(data, id)
 					.catch((err) => console.error(err))
 					.finally(() => {
 						e.target.value = 'edytuj';
-						elementsToUpdate.forEach((el) => {
-							el.contentEditable = false;
-							el.classList.remove('editable');
-						});
+						setItemEditable(targetEl, false);
 					});
 			} else {
 				e.target.value = 'zapisz';
-				elementsToUpdate.forEach((el) => {
-					el.contentEditable = true;
-					el.classList.add('editable');
-				});
+				setItemEditable(targetEl, true);
 			}
 		}
 	});
 };
 
+const findRootElement = () => {
+	return document.querySelector('.panel__excursions');
+};
+
 const insertData = (excArray) => {
-	ul.innerHTML = '';
+	const ulElement = findRootElement();
+	clearElement(ulElement);
 	excArray.forEach((item) => {
 		const newLiItem = createListEl(item);
 
-		ul.appendChild(newLiItem);
+		ulElement.appendChild(newLiItem);
 	});
 };
 
 const createListEl = (itemData) => {
-	const newLiItem = proto.cloneNode(true);
-	newLiItem.classList.remove('excursions__item--prototype');
-	const h2 = newLiItem.firstElementChild.firstElementChild;
-	const p = newLiItem.firstElementChild.lastElementChild;
-	const adultPrice = newLiItem.querySelector('.excursions__field-price--adult');
-	const childPrice = newLiItem.querySelector('.excursions__field-price--child');
+	const newLiItem = createElementFromProto();
+	const [title, description, adultPrice, childPrice] = getLiItems(newLiItem);
 
-	h2.innerText = itemData.name;
-	p.innerText = itemData.description;
+	title.innerText = itemData.name;
+	description.innerText = itemData.description;
 	adultPrice.innerText = itemData.adultPrice;
 	childPrice.innerText = itemData.childPrice;
 	newLiItem.dataset.id = itemData.id;
 
 	return newLiItem;
+};
+
+const createElementFromProto = () => {
+	const newElement = proto.cloneNode(true);
+	newElement.classList.remove('excursions__item--prototype');
+
+	return newElement;
+};
+
+const getLiItems = (root) => {
+	const title = root.querySelector('.excursions__title');
+	const description = root.querySelector('.excursions__description');
+	const adultPrice = root.querySelector('.excursions__field-price--adult');
+	const childPrice = root.querySelector('.excursions__field-price--child');
+
+	return [title, description, adultPrice, childPrice];
+};
+
+const findItemRoot = (targetEl) => {
+	return targetEl.parentElement.parentElement.parentElement;
+};
+
+const getIdFromRoot = (targetEl) => {
+	return findItemRoot(targetEl).dataset.id;
+};
+
+const isElementValue = (element, value) => {
+	return element.value === value;
+};
+
+const clearElement = (element) => {
+	element.innerHTML = '';
+};
+
+const isItemEditable = (targetEl) => {
+	const rootItem = findItemRoot(targetEl);
+	const elementsToUpdate = getLiItems(rootItem);
+	const isEditable = elementsToUpdate.every((el) => el.isContentEditable);
+
+	return isEditable;
+};
+
+const createDataToUpdate = (targetEl) => {
+	const rootItem = findItemRoot(targetEl);
+	const [name, description, adultPrice, childPrice] = getLiItems(rootItem);
+
+	return {
+		name: name.innerText,
+		description: description.innerText,
+		adultPrice: adultPrice.innerText,
+		childPrice: childPrice.innerText,
+	};
+};
+
+const setItemEditable = (targetEl, value) => {
+	const rootItem = findItemRoot(targetEl);
+	const elementsToUpdate = getLiItems(rootItem);
+
+	elementsToUpdate.forEach((el) => {
+		el.contentEditable = value;
+		toggleEditableClass(el, 'editable');
+	});
+};
+
+const toggleEditableClass = (element, value) => {
+	element.classList.toggle(value);
 };
 
 document.addEventListener('DOMContentLoaded', init);
