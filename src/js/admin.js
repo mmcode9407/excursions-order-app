@@ -9,6 +9,7 @@ const proto = document.querySelector('.excursions__item--prototype');
 const init = () => {
 	load();
 	remove();
+	add();
 };
 
 const load = () => {
@@ -29,6 +30,37 @@ const remove = () => {
 				.removeData(id)
 				.catch((err) => console.error(err))
 				.finally(load);
+		}
+	});
+};
+
+const add = () => {
+	const form = document.querySelector('.form');
+	form.addEventListener('submit', (e) => {
+		e.preventDefault();
+		const { name, description, adultPrice, childPrice } = e.target.elements;
+
+		if (
+			name.value !== '' &&
+			description.value !== '' &&
+			adultPrice.value !== '' &&
+			childPrice.value !== ''
+		) {
+			const data = {
+				name: name.value,
+				description: description.value,
+				adultPrice: adultPrice.value,
+				childPrice: childPrice.value,
+			};
+			api
+				.addData(data)
+				.catch((err) => console.error(err))
+				.finally(() => {
+					load();
+					e.target.reset();
+				});
+		} else {
+			alert('Pola nie mogą być puste');
 		}
 	});
 };
