@@ -28,6 +28,8 @@ const addToCart = () => {
 		const targetEl = e.target;
 		const parentEl = targetEl.parentElement;
 		const summaryUlList = document.querySelector('.panel__summary');
+		let summary = 0;
+		const totalOrderPrice = document.querySelector('.order__total-price-value');
 		const [title, , adultPrice, childPrice] = getLiItems(parentEl);
 		const [adultQTY, childQTY] = targetEl.elements;
 
@@ -65,7 +67,12 @@ const addToCart = () => {
 				summaryDescription.innerText = `dorośli: ${item.adultNumber} x ${item.adultPrice}PLN, dzieci: ${item.childNumber} x ${item.childPrice}PLN`;
 
 				summaryUlList.appendChild(newSumLiItem);
+
+				summary +=
+					item.adultNumber * item.adultPrice +
+					item.childNumber * item.childPrice;
 			});
+			totalOrderPrice.innerText = `${summary}PLN`;
 		} else {
 			alert('Podaj ilość osób...');
 		}
