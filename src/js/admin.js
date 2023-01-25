@@ -8,6 +8,7 @@ const proto = document.querySelector('.excursions__item--prototype');
 
 const init = () => {
 	load();
+	remove();
 };
 
 const load = () => {
@@ -17,6 +18,19 @@ const load = () => {
 			insertData(data);
 		})
 		.catch((err) => console.log(err));
+};
+
+const remove = () => {
+	ul.addEventListener('click', (e) => {
+		e.preventDefault();
+		if (e.target.value === 'usuń') {
+			const id = e.target.parentElement.parentElement.parentElement.dataset.id;
+			api
+				.removeData(id)
+				.catch((err) => console.error(err))
+				.finally(load);
+		}
+	});
 };
 
 const insertData = (excArray) => {
