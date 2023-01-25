@@ -2,20 +2,53 @@ import './../css/client.css';
 
 import ExcursionsAPI from './ExcursionsAPI';
 
-const api = new ExcursionsAPI('excursions');
+const API_EXC = new ExcursionsAPI('excursions');
+const API_ORDERS = new ExcursionsAPI('orders');
 const proto = document.querySelector('.excursions__item--prototype');
+let cart = [];
 
 const init = () => {
 	load();
+	addToCart();
 };
 
 const load = () => {
-	api
-		.loadData()
+	API_EXC.loadData()
 		.then((data) => {
 			insertData(data);
 		})
 		.catch((err) => console.log(err));
+};
+
+const addToCart = () => {
+	const ulElement = findRootElement();
+	ulElement.addEventListener('submit', (e) => {
+		e.preventDefault();
+		const targetEl = e.target;
+		const parentEl = targetEl.parentElement;
+		const [title, , adultPrice, childPrice] = getLiItems(parentEl);
+		const [adultQTY, childQTY] = targetEl.elements;
+
+		if (
+			adultQTY.value !== '' &&
+			childQTY.value !== '' &&
+			!isNaN(adultQTY.value) &&
+			!isNaN(childQTY.value)
+		) {
+			const basketData = {
+				title: title.textContent,
+				adultNumber: adultQTY.value,
+				adultPrice: adultPrice.textContent,
+				childNumber: childQTY.value,
+				childPrice: childPrice.textContent,
+			};
+
+			cart.push(basketData);
+		} else {
+			alert('Podaj ilość osób...');
+		}
+		targetEl.reset();
+	});
 };
 
 const findRootElement = () => {
