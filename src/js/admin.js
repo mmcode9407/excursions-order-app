@@ -2,8 +2,8 @@ import './../css/admin.css';
 
 import ExcursionsAPI from './ExcursionsAPI';
 
-const api = new ExcursionsAPI('excursions');
-const proto = document.querySelector('.excursions__item--prototype');
+const API_EXC = new ExcursionsAPI('excursions');
+const excProto = document.querySelector('.excursions__item--prototype');
 
 const init = () => {
 	load();
@@ -12,9 +12,10 @@ const init = () => {
 	update();
 };
 
+document.addEventListener('DOMContentLoaded', init);
+
 const load = () => {
-	api
-		.loadData()
+	API_EXC.loadData()
 		.then((data) => {
 			insertData(data);
 		})
@@ -22,14 +23,13 @@ const load = () => {
 };
 
 const remove = () => {
-	const ulElement = findRootElement();
+	const ulElement = findListRoot();
 	ulElement.addEventListener('click', (e) => {
 		e.preventDefault();
 		const targetEl = e.target;
 		if (isElementValue(targetEl, 'usuń')) {
 			const id = getIdFromRoot(targetEl);
-			api
-				.removeData(id)
+			API_EXC.removeData(id)
 				.catch((err) => console.error(err))
 				.finally(load);
 		}
@@ -54,8 +54,7 @@ const add = () => {
 				adultPrice: adultPrice.value,
 				childPrice: childPrice.value,
 			};
-			api
-				.addData(data)
+			API_EXC.addData(data)
 				.catch((err) => console.error(err))
 				.finally(() => {
 					load();
@@ -68,7 +67,7 @@ const add = () => {
 };
 
 const update = () => {
-	const ulElement = findRootElement();
+	const ulElement = findListRoot();
 	ulElement.addEventListener('click', (e) => {
 		e.preventDefault();
 		const targetEl = e.target;
@@ -79,8 +78,7 @@ const update = () => {
 			if (isItemEditable(targetEl)) {
 				const id = getIdFromRoot(targetEl);
 				const data = createDataToUpdate(targetEl);
-				api
-					.updateData(data, id)
+				API_EXC.updateData(data, id)
 					.catch((err) => console.error(err))
 					.finally(() => {
 						e.target.value = 'edytuj';
@@ -94,12 +92,12 @@ const update = () => {
 	});
 };
 
-const findRootElement = () => {
+const findListRoot = () => {
 	return document.querySelector('.panel__excursions');
 };
 
 const insertData = (excArray) => {
-	const ulElement = findRootElement();
+	const ulElement = findListRoot();
 	clearElement(ulElement);
 	excArray.forEach((item) => {
 		const newLiItem = createListEl(item);
@@ -122,7 +120,7 @@ const createListEl = (itemData) => {
 };
 
 const createElementFromProto = () => {
-	const newElement = proto.cloneNode(true);
+	const newElement = excProto.cloneNode(true);
 	newElement.classList.remove('excursions__item--prototype');
 
 	return newElement;
@@ -186,5 +184,3 @@ const setItemEditable = (targetEl, value) => {
 const toggleEditableClass = (element, value) => {
 	element.classList.toggle(value);
 };
-
-document.addEventListener('DOMContentLoaded', init);
