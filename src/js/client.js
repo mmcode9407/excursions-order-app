@@ -12,6 +12,7 @@ const init = () => {
 	load();
 	addToCart();
 	removeFromCart();
+	submitOrder();
 };
 
 document.addEventListener('DOMContentLoaded', init);
@@ -65,6 +66,33 @@ const handleRemoveFromCart = (e) => {
 
 		filterCartById(idRemovedEl);
 		renderCart(cart);
+	}
+};
+
+const submitOrder = () => {
+	const orderForm = document.querySelector('.panel__order');
+	orderForm.addEventListener('submit', handleSubmitOrder);
+};
+
+const handleSubmitOrder = (e) => {
+	e.preventDefault();
+	const targetEl = e.target;
+	const fields = createFieldsToCheck();
+
+	if (cart.length !== 0) {
+		const errors = checkDataInForm(fields, targetEl);
+		if (errors.length === 0) {
+			showInfo(targetEl);
+			clearInputsValue(fields, targetEl);
+			cart = [];
+			renderCart(cart);
+		} else {
+			createErrorsList(errors);
+		}
+	} else {
+		alert(
+			'Koszyk jest pusty! Aby dokonać zamówienia prosimy o dodanie wycieczki do koszyka.'
+		);
 	}
 };
 
@@ -212,4 +240,68 @@ const getElementToRemove = (targetEl) => {
 
 const filterCartById = (idToRemove) => {
 	cart = cart.filter((item) => item.id !== parseInt(idToRemove));
+};
+
+const checkDataInForm = (arr, targetEl) => {
+	let errors = [];
+	arr.forEach(function (arrEl) {
+		const { name, label, pattern = null, required = false } = arrEl;
+		const inputValue = targetEl.elements[name].value;
+
+		if (required) {
+			if (inputValue === '') {
+				errors.push(`Dane w polu ${label} są wymagane!`);
+			}
+		}
+
+		if (pattern) {
+			const reg = new RegExp(pattern);
+			if (!reg.test(inputValue)) {
+				errors.push(`Dane w polu ${label} nie są w odpowiednim formacie!`);
+			}
+		}
+	});
+
+	return errors;
+};
+
+const createErrorsList = (errorsBox) => {
+	const errorsList = findListRoot('.order__field-errors');
+	clearElement(errorsList);
+	errorsBox.forEach(function (err) {
+		const liEl = document.createElement('li');
+		liEl.innerText = err;
+		errorsList.appendChild(liEl);
+	});
+};
+
+const clearInputsValue = (arr, targetEl) => {
+	arr.forEach(function (el) {
+		targetEl[el.name].value = '';
+	});
+};
+
+const createFieldsToCheck = () => {
+	return [
+		{
+			name: 'name',
+			label: 'Imię i Nazwisko',
+			required: true,
+			pattern: '[a-z]',
+		},
+		{
+			name: 'email',
+			label: 'Email',
+			required: true,
+			pattern: '[0-9a-z_.-]+@[0-9a-z.-]+.[a-z]{2,3}',
+		},
+	];
+};
+
+const showInfo = (targetEl) => {
+	const totalOrderPriceElement = getTotalOrderElementToUpdate();
+	const { email } = targetEl.elements;
+	alert(
+		`Dziękujemy za złożenie zamówienia o wartości ${totalOrderPriceElement.textContent}. Szczegóły zamówienia zostały wysłane na adres e-mail: ${email.value}.`
+	);
 };
