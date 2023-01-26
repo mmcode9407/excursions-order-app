@@ -156,7 +156,7 @@ const renderCart = (cart) => {
 		const newSumLiItem = createSumListItem(item);
 		summaryUlList.appendChild(newSumLiItem);
 	});
-	setTotalOrderPrice(cart);
+	setTotalOrderPrice();
 };
 
 const createSumListItem = (itemData) => {
@@ -186,14 +186,20 @@ const getSumItems = (root) => {
 	return [summaryName, summaryPrice, summaryDescription];
 };
 
-const setTotalOrderPrice = (cart) => {
-	const totalOrderPrice = getTotalOrderElementToUpdate();
+const setTotalOrderPrice = () => {
+	const totalOrderPriceElement = getTotalOrderElementToUpdate();
+	const totalOrderPrice = getSummary();
+	totalOrderPriceElement.innerText = `${totalOrderPrice}PLN`;
+};
+
+const getSummary = () => {
 	let summary = 0;
 	cart.forEach((item) => {
 		summary +=
 			item.adultNumber * item.adultPrice + item.childNumber * item.childPrice;
 	});
-	totalOrderPrice.innerText = `${summary}PLN`;
+
+	return summary;
 };
 
 const getTotalOrderElementToUpdate = () => {
