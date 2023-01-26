@@ -11,7 +11,10 @@ let cart = [];
 const init = () => {
 	load();
 	addToCart();
+	removeFromCart();
 };
+
+document.addEventListener('DOMContentLoaded', init);
 
 const load = () => {
 	API_EXC.loadData()
@@ -46,6 +49,23 @@ const handleAddToCart = (e) => {
 		alert('Podaj ilość osób...');
 	}
 	targetEl.reset();
+};
+
+const removeFromCart = () => {
+	const summaryUlList = findListRoot('.panel__summary');
+	summaryUlList.addEventListener('click', handleRemoveFromCart);
+};
+
+const handleRemoveFromCart = (e) => {
+	e.preventDefault();
+	const targetEl = e.target;
+	if (targetEl.classList.contains('summary__btn-remove')) {
+		const elToRemove = getElementToRemove(targetEl);
+		const idRemovedEl = elToRemove.dataset.id;
+
+		filterCartById(idRemovedEl);
+		renderCart(cart);
+	}
 };
 
 const findListRoot = (className) => {
@@ -122,9 +142,11 @@ const getDataForCart = (targetEl) => {
 };
 
 const getMaxId = (array) => {
-	array.reduce((acc, next) => {
-		return acc < next.id ? next.id : acc;
-	}, 0) + 1;
+	return (
+		array.reduce((acc, next) => {
+			return acc < next.id ? next.id : acc;
+		}, 0) + 1
+	);
 };
 
 const renderCart = (cart) => {
@@ -134,6 +156,7 @@ const renderCart = (cart) => {
 		const newSumLiItem = createSumListItem(item);
 		summaryUlList.appendChild(newSumLiItem);
 	});
+	setTotalOrderPrice(cart);
 };
 
 const createSumListItem = (itemData) => {
@@ -152,8 +175,6 @@ const createSumListItem = (itemData) => {
 	newSumLiItem.dataset.id = itemData.id;
 	summaryDescription.innerText = `dorośli: ${itemData.adultNumber} x ${itemData.adultPrice}PLN, dzieci: ${itemData.childNumber} x ${itemData.childPrice}PLN`;
 
-	getSummary(cart);
-
 	return newSumLiItem;
 };
 
@@ -165,7 +186,7 @@ const getSumItems = (root) => {
 	return [summaryName, summaryPrice, summaryDescription];
 };
 
-const getSummary = (cart) => {
+const setTotalOrderPrice = (cart) => {
 	const totalOrderPrice = getTotalOrderElementToUpdate();
 	let summary = 0;
 	cart.forEach((item) => {
@@ -173,11 +194,16 @@ const getSummary = (cart) => {
 			item.adultNumber * item.adultPrice + item.childNumber * item.childPrice;
 	});
 	totalOrderPrice.innerText = `${summary}PLN`;
-
-	return summary;
 };
 
 const getTotalOrderElementToUpdate = () => {
 	return document.querySelector('.order__total-price-value');
 };
-document.addEventListener('DOMContentLoaded', init);
+
+const getElementToRemove = (targetEl) => {
+	return targetEl.parentElement.parentElement;
+};
+
+const filterCartById = (idToRemove) => {
+	cart = cart.filter((item) => item.id !== parseInt(idToRemove));
+};
