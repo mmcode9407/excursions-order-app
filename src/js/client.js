@@ -16,87 +16,58 @@ const init = () => {
 const load = () => {
 	API_EXC.loadData()
 		.then((data) => {
-			insertData(data);
+			insertExcData(data);
 		})
 		.catch((err) => console.log(err));
 };
 
 const addToCart = () => {
-	const ulElement = findRootElement();
-	ulElement.addEventListener('submit', (e) => {
-		e.preventDefault();
-		const targetEl = e.target;
-		const parentEl = targetEl.parentElement;
-		const summaryUlList = document.querySelector('.panel__summary');
-		let summary = 0;
-		const totalOrderPrice = document.querySelector('.order__total-price-value');
-		const [title, , adultPrice, childPrice] = getLiItems(parentEl);
-		const [adultQTY, childQTY] = targetEl.elements;
-
-		if (
-			adultQTY.value !== '' &&
-			childQTY.value !== '' &&
-			!isNaN(adultQTY.value) &&
-			!isNaN(childQTY.value)
-		) {
-			const basketData = {
-				title: title.textContent,
-				adultNumber: adultQTY.value,
-				adultPrice: adultPrice.textContent,
-				childNumber: childQTY.value,
-				childPrice: childPrice.textContent,
-			};
-
-			cart.push(basketData);
-			clearElement(summaryUlList);
-			cart.forEach((item) => {
-				const newSumLiItem = createElementFromSumProto();
-
-				const summaryName = newSumLiItem.querySelector('.summary__name');
-				const summaryPrice = newSumLiItem.querySelector(
-					'.summary__total-price'
-				);
-				const summaryDescription =
-					newSumLiItem.querySelector('.summary__prices');
-				summaryName.innerText = item.title;
-				summaryPrice.innerText = `${
-					item.adultNumber * item.adultPrice +
-					item.childNumber * item.childPrice
-				}PLN`;
-
-				summaryDescription.innerText = `dorośli: ${item.adultNumber} x ${item.adultPrice}PLN, dzieci: ${item.childNumber} x ${item.childPrice}PLN`;
-
-				summaryUlList.appendChild(newSumLiItem);
-
-				summary +=
-					item.adultNumber * item.adultPrice +
-					item.childNumber * item.childPrice;
-			});
-			totalOrderPrice.innerText = `${summary}PLN`;
-		} else {
-			alert('Podaj ilość osób...');
-		}
-		targetEl.reset();
-	});
+	const ulElement = findListRoot('.panel__excursions');
+	ulElement.addEventListener('submit', handleAddToCart);
 };
 
-const findRootElement = () => {
-	return document.querySelector('.panel__excursions');
+const handleAddToCart = (e) => {
+	e.preventDefault();
+	const targetEl = e.target;
+	const [adultQTY, childQTY] = targetEl.elements;
+
+	if (
+		!isEmptyInput(adultQTY) &&
+		!isEmptyInput(childQTY) &&
+		!isInputNaN(adultQTY) &&
+		!isInputNaN(childQTY)
+	) {
+		const basketData = getDataForCart(targetEl);
+
+		cart.push(basketData);
+
+		renderCart(cart);
+	} else {
+		alert('Podaj ilość osób...');
+	}
+	targetEl.reset();
 };
 
-const insertData = (excArray) => {
-	const ulElement = findRootElement();
+const findListRoot = (className) => {
+	return document.querySelector(className);
+};
+
+const insertExcData = (excArray) => {
+	const ulElement = findListRoot('.panel__excursions');
 	clearElement(ulElement);
 	excArray.forEach((item) => {
-		const newLiItem = createListEl(item);
+		const newLiItem = createExcListItem(item);
 
 		ulElement.appendChild(newLiItem);
 	});
 };
 
-const createListEl = (itemData) => {
-	const newLiItem = createElementFromExcProto();
-	const [title, description, adultPrice, childPrice] = getLiItems(newLiItem);
+const createExcListItem = (itemData) => {
+	const newLiItem = createElementFromProto(
+		excProto,
+		'excursions__item--prototype'
+	);
+	const [title, description, adultPrice, childPrice] = getExcItems(newLiItem);
 
 	title.innerText = itemData.name;
 	description.innerText = itemData.description;
@@ -107,20 +78,14 @@ const createListEl = (itemData) => {
 	return newLiItem;
 };
 
-const createElementFromExcProto = () => {
-	const newElement = excProto.cloneNode(true);
-	newElement.classList.remove('excursions__item--prototype');
-
-	return newElement;
-};
-const createElementFromSumProto = () => {
-	const newElement = sumProto.cloneNode(true);
-	newElement.classList.remove('summary__item--prototype');
+const createElementFromProto = (prototype, prototypeClassName) => {
+	const newElement = prototype.cloneNode(true);
+	newElement.classList.remove(prototypeClassName);
 
 	return newElement;
 };
 
-const getLiItems = (root) => {
+const getExcItems = (root) => {
 	const title = root.querySelector('.excursions__title');
 	const description = root.querySelector('.excursions__description');
 	const adultPrice = root.querySelector('.excursions__price--adult');
@@ -133,4 +98,86 @@ const clearElement = (element) => {
 	element.innerHTML = '';
 };
 
+const isEmptyInput = (input) => {
+	return input.value === '';
+};
+
+const isInputNaN = (input) => {
+	return isNaN(input.value);
+};
+
+const getDataForCart = (targetEl) => {
+	const parentEl = targetEl.parentElement;
+	const [title, , adultPrice, childPrice] = getExcItems(parentEl);
+	const [adultQTY, childQTY] = targetEl.elements;
+
+	return {
+		title: title.textContent,
+		adultNumber: adultQTY.value,
+		adultPrice: adultPrice.textContent,
+		childNumber: childQTY.value,
+		childPrice: childPrice.textContent,
+		id: getMaxId(cart),
+	};
+};
+
+const getMaxId = (array) => {
+	array.reduce((acc, next) => {
+		return acc < next.id ? next.id : acc;
+	}, 0) + 1;
+};
+
+const renderCart = (cart) => {
+	const summaryUlList = findListRoot('.panel__summary');
+	clearElement(summaryUlList);
+	cart.forEach((item) => {
+		const newSumLiItem = createSumListItem(item);
+		summaryUlList.appendChild(newSumLiItem);
+	});
+};
+
+const createSumListItem = (itemData) => {
+	const newSumLiItem = createElementFromProto(
+		sumProto,
+		'summary__item--prototype'
+	);
+	const [summaryName, summaryPrice, summaryDescription] =
+		getSumItems(newSumLiItem);
+	const summaryPriceValue =
+		itemData.adultNumber * itemData.adultPrice +
+		itemData.childNumber * itemData.childPrice;
+
+	summaryName.innerText = itemData.title;
+	summaryPrice.innerText = `${summaryPriceValue}PLN`;
+	newSumLiItem.dataset.id = itemData.id;
+	summaryDescription.innerText = `dorośli: ${itemData.adultNumber} x ${itemData.adultPrice}PLN, dzieci: ${itemData.childNumber} x ${itemData.childPrice}PLN`;
+
+	getSummary(cart);
+
+	return newSumLiItem;
+};
+
+const getSumItems = (root) => {
+	const summaryName = root.querySelector('.summary__name');
+	const summaryPrice = root.querySelector('.summary__total-price');
+	const summaryDescription = root.querySelector('.summary__prices');
+
+	return [summaryName, summaryPrice, summaryDescription];
+};
+
+const getSummary = (cart) => {
+	const totalOrderPrice = getTotalOrderElementToUpdate();
+	let summary = 0;
+	cart.forEach((item) => {
+		summary +=
+			item.adultNumber * item.adultPrice + item.childNumber * item.childPrice;
+	});
+	totalOrderPrice.innerText = `${summary}PLN`;
+
+	return summary;
+};
+
+const getTotalOrderElementToUpdate = () => {
+	return document.querySelector('.order__total-price-value');
+};
 document.addEventListener('DOMContentLoaded', init);
