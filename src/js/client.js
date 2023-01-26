@@ -82,10 +82,7 @@ const handleSubmitOrder = (e) => {
 	if (cart.length !== 0) {
 		const errors = checkDataInForm(fields, targetEl);
 		if (errors.length === 0) {
-			showInfo(targetEl);
-			clearInputsValue(fields, targetEl);
-			cart = [];
-			renderCart(cart);
+			addOrder(targetEl, fields);
 		} else {
 			createErrorsList(errors);
 		}
@@ -304,4 +301,36 @@ const showInfo = (targetEl) => {
 	alert(
 		`Dziękujemy za złożenie zamówienia o wartości ${totalOrderPriceElement.textContent}. Szczegóły zamówienia zostały wysłane na adres e-mail: ${email.value}.`
 	);
+};
+
+const addOrder = (targetEl, fields) => {
+	const data = createDataToAdd(targetEl);
+
+	API_ORDERS.addData(data)
+		.catch((err) => console.error(err))
+		.finally(() => {
+			showInfo(targetEl);
+			clearInputsValue(fields, targetEl);
+			cart = [];
+			renderCart(cart);
+		});
+};
+
+const createDataToAdd = (targetEl) => {
+	const { name: participantName, email: participantEmail } = targetEl.elements;
+	const cartDataForAPI = cart.map((item) => {
+		const { adultNumber, childNumber, title } = item;
+
+		return {
+			adultNumber: adultNumber,
+			childNumber: childNumber,
+			title: title,
+		};
+	});
+
+	return {
+		participantName: participantName.value,
+		participantEmail: participantEmail.value,
+		orderDetails: cartDataForAPI,
+	};
 };
