@@ -77,11 +77,11 @@ const update = () => {
 				API_EXC.updateData(data, id)
 					.catch((err) => console.error(err))
 					.finally(() => {
-						e.target.value = 'edytuj';
+						targetEl.value = 'edytuj';
 						setItemEditable(targetEl, false);
 					});
 			} else {
-				e.target.value = 'zapisz';
+				targetEl.value = 'zapisz';
 				setItemEditable(targetEl, true);
 			}
 		}
