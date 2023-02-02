@@ -27,7 +27,7 @@ const remove = () => {
 	ulElement.addEventListener('click', (e) => {
 		e.preventDefault();
 		const targetEl = e.target;
-		if (isElementValue(targetEl, 'usuń')) {
+		if (hasFieldValueLike(targetEl, 'usuń')) {
 			const id = getIdFromRoot(targetEl);
 			API_EXC.removeData(id)
 				.catch((err) => console.error(err))
@@ -40,14 +40,10 @@ const add = () => {
 	const form = document.querySelector('.form');
 	form.addEventListener('submit', (e) => {
 		e.preventDefault();
-		const { name, description, adultPrice, childPrice } = e.target.elements;
+		const targetEl = e.target;
 
-		if (
-			!isElementValue(name, '') &&
-			!isElementValue(description, '') &&
-			!isElementValue(adultPrice, '') &&
-			!isElementValue(childPrice, '')
-		) {
+		if (areFieldsCorrect(targetEl)) {
+			const { name, description, adultPrice, childPrice } = targetEl.elements;
 			const data = {
 				name: name.value,
 				description: description.value,
@@ -58,7 +54,7 @@ const add = () => {
 				.catch((err) => console.error(err))
 				.finally(() => {
 					load();
-					e.target.reset();
+					targetEl.reset();
 				});
 		} else {
 			alert('Pola nie mogą być puste...');
@@ -72,8 +68,8 @@ const update = () => {
 		e.preventDefault();
 		const targetEl = e.target;
 		if (
-			isElementValue(targetEl, 'edytuj') ||
-			isElementValue(targetEl, 'zapisz')
+			hasFieldValueLike(targetEl, 'edytuj') ||
+			hasFieldValueLike(targetEl, 'zapisz')
 		) {
 			if (isItemEditable(targetEl)) {
 				const id = getIdFromRoot(targetEl);
@@ -143,8 +139,19 @@ const getIdFromRoot = (targetEl) => {
 	return findItemRoot(targetEl).dataset.id;
 };
 
-const isElementValue = (element, value) => {
+const hasFieldValueLike = (element, value) => {
 	return element.value === value;
+};
+
+const areFieldsCorrect = (targetEl) => {
+	const { name, description, adultPrice, childPrice } = targetEl.elements;
+
+	return (
+		!hasFieldValueLike(name, '') &&
+		!hasFieldValueLike(description, '') &&
+		!hasFieldValueLike(adultPrice, '') &&
+		!hasFieldValueLike(childPrice, '')
+	);
 };
 
 const clearElement = (element) => {
