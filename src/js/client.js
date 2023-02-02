@@ -318,6 +318,7 @@ const addOrder = (targetEl, fields) => {
 
 const createDataToAdd = (targetEl) => {
 	const { name: participantName, email: participantEmail } = targetEl.elements;
+	const orderDate = getOrderDate();
 	const cartDataForAPI = cart.map((item) => {
 		const { adultNumber, childNumber, title } = item;
 
@@ -332,5 +333,23 @@ const createDataToAdd = (targetEl) => {
 		participantName: participantName.value,
 		participantEmail: participantEmail.value,
 		orderDetails: cartDataForAPI,
+		orderDate: orderDate,
 	};
+};
+
+const getOrderDate = () => {
+	const date = new Date();
+
+	const orderDate = date
+		.toLocaleString('nu', {
+			day: '2-digit',
+			month: '2-digit',
+			year: 'numeric',
+			hour12: false,
+			hour: '2-digit',
+			minute: '2-digit',
+		})
+		.replace(',', '');
+
+	return orderDate;
 };
