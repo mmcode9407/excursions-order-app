@@ -319,13 +319,16 @@ const addOrder = (targetEl, fields) => {
 const createDataToAdd = (targetEl) => {
 	const { name: participantName, email: participantEmail } = targetEl.elements;
 	const orderDate = getOrderDate();
+	const totalOrderPriceElement = getTotalOrderElementToUpdate();
 	const cartDataForAPI = cart.map((item) => {
-		const { adultNumber, childNumber, title } = item;
+		const { adultNumber, childNumber, title, adultPrice, childPrice } = item;
 
 		return {
-			adultNumber: adultNumber,
-			childNumber: childNumber,
 			title: title,
+			adultNumber: adultNumber,
+			adultPrice: `${adultPrice}PLN`,
+			childNumber: childNumber,
+			childPrice: `${childPrice}PLN`,
 		};
 	});
 
@@ -334,6 +337,7 @@ const createDataToAdd = (targetEl) => {
 		participantEmail: participantEmail.value,
 		orderDetails: cartDataForAPI,
 		orderDate: orderDate,
+		orderTotalPrice: totalOrderPriceElement.textContent,
 	};
 };
 
