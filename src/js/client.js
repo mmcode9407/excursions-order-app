@@ -1,23 +1,29 @@
 import './../css/client.css';
 
 import ExcursionsAPI from './ExcursionsAPI';
+import ClientService from './ClientService';
 
-const API_EXC = new ExcursionsAPI('excursions');
-const API_ORDERS = new ExcursionsAPI('orders');
-const excProto = document.querySelector('.excursions__item--prototype');
-const sumProto = document.querySelector('.summary__item--prototype');
-let cart = [];
+// const API_EXC = new ExcursionsAPI('excursions');
+// const API_ORDERS = new ExcursionsAPI('orders');
+// const excProto = document.querySelector('.excursions__item--prototype');
+// const sumProto = document.querySelector('.summary__item--prototype');
+// let cart = [];
 
 const init = () => {
-	load();
-	addToCart();
-	removeFromCart();
-	submitOrder();
+	const API_EXC = new ExcursionsAPI('excursions');
+	const API_ORDERS = new ExcursionsAPI('orders');
+	const clientExc = new ClientService(API_EXC);
+	const clientOrders = new ClientService(API_ORDERS);
+
+	clientExc.load();
+	clientOrders.addToCart();
+	// clientOrders.removeFromCart();
+	// submitOrder();
 };
 
 document.addEventListener('DOMContentLoaded', init);
 
-const load = () => {
+/* const load = () => {
 	API_EXC.loadData()
 		.then((data) => {
 			insertExcData(data);
@@ -357,3 +363,4 @@ const getOrderDate = () => {
 
 	return orderDate;
 };
+ */
