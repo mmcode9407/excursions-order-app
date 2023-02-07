@@ -140,8 +140,8 @@
 	_getExcItems(root) {
 		const title = root.querySelector('.excursions__title');
 		const description = root.querySelector('.excursions__description');
-		const adultPrice = root.querySelector('.excursions__price--adult');
-		const childPrice = root.querySelector('.excursions__price--child');
+		const adultPrice = root.querySelector('.excursions__field-price--adult');
+		const childPrice = root.querySelector('.excursions__field-price--child');
 
 		return [title, description, adultPrice, childPrice];
 	}
