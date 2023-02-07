@@ -1,32 +1,16 @@
-﻿export default class AdminService {
-	constructor(API) {
-		this.API_SERVICE = API;
-	}
+﻿import Helper from './Helper';
 
-	load() {
-		this.API_SERVICE.loadData()
-			.then((data) => {
-				this.insertData(data);
-			})
-			.catch((err) => console.log(err));
-	}
-
-	insertData(excArray) {
-		const ulElement = this._findListRoot('.panel__excursions');
-		this._clearListElements(ulElement);
-
-		excArray.forEach((item) => {
-			const newLiItem = this._createListItem(item);
-			ulElement.appendChild(newLiItem);
-		});
+export default class AdminService extends Helper {
+	constructor(API_SERVICE) {
+		super(API_SERVICE);
 	}
 
 	remove() {
-		const ulElement = this._findListRoot();
+		const ulElement = super._findListRoot('.panel__excursions');
 		ulElement.addEventListener('click', (e) => {
 			e.preventDefault();
 			const targetEl = e.target;
-			if (this._hasFieldValueLike(targetEl, 'usuń')) {
+			if (super._hasFieldValueLike(targetEl, 'usuń')) {
 				const id = this._getIdFromRoot(targetEl);
 				this.API_SERVICE.removeData(id)
 					.catch((err) => console.error(err))
@@ -62,13 +46,13 @@
 	}
 
 	update() {
-		const ulElement = this._findListRoot();
+		const ulElement = super._findListRoot('.panel__excursions');
 		ulElement.addEventListener('click', (e) => {
 			e.preventDefault();
 			const targetEl = e.target;
 			if (
-				this._hasFieldValueLike(targetEl, 'edytuj') ||
-				this._hasFieldValueLike(targetEl, 'zapisz')
+				super._hasFieldValueLike(targetEl, 'edytuj') ||
+				super._hasFieldValueLike(targetEl, 'zapisz')
 			) {
 				if (this._isItemEditable(targetEl)) {
 					const id = this._getIdFromRoot(targetEl);
@@ -87,55 +71,6 @@
 		});
 	}
 
-	_findListRoot() {
-		return document.querySelector('.panel__excursions');
-	}
-
-	_createListItem(itemData) {
-		const newLiItem = this._createElementFromProto(
-			'excursions__item--prototype'
-		);
-		const [title, description, adultPrice, childPrice] =
-			this._getLiItems(newLiItem);
-
-		title.innerText = itemData.name;
-		description.innerText = itemData.description;
-		adultPrice.innerText = itemData.adultPrice;
-		childPrice.innerText = itemData.childPrice;
-		newLiItem.dataset.id = itemData.id;
-
-		return newLiItem;
-	}
-
-	_findPrototypeElementByClass(prototypeClassName) {
-		return document.querySelector(`.${prototypeClassName}`);
-	}
-
-	_createElementFromProto(prototypeClassName) {
-		const protoELement = this._findPrototypeElementByClass(prototypeClassName);
-		const newElement = protoELement.cloneNode(true);
-		newElement.classList.remove(prototypeClassName);
-
-		return newElement;
-	}
-
-	_getLiItems(root) {
-		const title = root.querySelector('.excursions__title');
-		const description = root.querySelector('.excursions__description');
-		const adultPrice = root.querySelector('.excursions__field-price--adult');
-		const childPrice = root.querySelector('.excursions__field-price--child');
-
-		return [title, description, adultPrice, childPrice];
-	}
-
-	_clearListElements(element) {
-		for (const el of element.children) {
-			if (!el.className.includes('--prototype')) {
-				el.remove();
-			}
-		}
-	}
-
 	_findItemRoot(targetEl) {
 		return targetEl.parentElement.parentElement.parentElement;
 	}
@@ -144,18 +79,14 @@
 		return this._findItemRoot(targetEl).dataset.id;
 	}
 
-	_hasFieldValueLike(element, value) {
-		return element.value === value;
-	}
-
 	_areFieldsCorrect(targetEl) {
 		const { name, description, adultPrice, childPrice } = targetEl.elements;
 
 		return (
-			!this._hasFieldValueLike(name, '') &&
-			!this._hasFieldValueLike(description, '') &&
-			!this._hasFieldValueLike(adultPrice, '') &&
-			!this._hasFieldValueLike(childPrice, '')
+			!super._hasFieldValueLike(name, '') &&
+			!super._hasFieldValueLike(description, '') &&
+			!super._hasFieldValueLike(adultPrice, '') &&
+			!super._hasFieldValueLike(childPrice, '')
 		);
 	}
 
