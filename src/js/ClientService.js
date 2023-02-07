@@ -24,25 +24,50 @@
 
 	addToCart() {
 		const ulElement = this._findListRoot('.panel__excursions');
-		ulElement.addEventListener('submit', (e) =>
-			this.handleAddToCart(e, this.cart)
-		);
+		ulElement.addEventListener('submit', (e) => this.handleAddToCart(e));
 	}
 
-	handleAddToCart(e, cart) {
+	handleAddToCart(e) {
 		e.preventDefault();
 		const targetEl = e.target;
 
 		if (this._areFieldsCorrect(targetEl)) {
-			const basketData = this._getDataForCart(targetEl, cart);
+			const basketData = this._getDataForCart(targetEl);
 
-			cart.push(basketData);
+			this.cart.push(basketData);
 
-			this._renderCart(cart);
+			this._renderCart();
 		} else {
 			alert('Podaj ilość osób...');
 		}
 		targetEl.reset();
+	}
+
+	removeFromCart() {
+		const summaryUlList = this._findListRoot('.panel__summary');
+		summaryUlList.addEventListener('click', (e) =>
+			this.handleRemoveFromCart(e)
+		);
+	}
+
+	handleRemoveFromCart(e) {
+		e.preventDefault();
+		const targetEl = e.target;
+		if (targetEl.classList.contains('summary__btn-remove')) {
+			const elToRemove = this._getElementToRemove(targetEl);
+			const idRemovedEl = elToRemove.dataset.id;
+
+			this._filterCartById(idRemovedEl);
+			this._renderCart();
+		}
+	}
+
+	_getElementToRemove(targetEl) {
+		return targetEl.parentElement.parentElement;
+	}
+
+	_filterCartById(idToRemove) {
+		this.cart = this.cart.filter((item) => item.id !== parseInt(idToRemove));
 	}
 
 	_findListRoot(className) {
@@ -114,7 +139,7 @@
 		});
 	}
 
-	_getDataForCart(targetEl, cart) {
+	_getDataForCart(targetEl) {
 		const parentEl = targetEl.parentElement;
 		const [title, , adultPrice, childPrice] = this._getExcItems(parentEl);
 		const [adultQTY, childQTY] = targetEl.elements;
@@ -125,7 +150,7 @@
 			adultPrice: adultPrice.textContent,
 			childNumber: childQTY.value,
 			childPrice: childPrice.textContent,
-			id: this._getMaxId(cart),
+			id: this._getMaxId(this.cart),
 		};
 	}
 
@@ -137,14 +162,14 @@
 		);
 	}
 
-	_renderCart(cart) {
+	_renderCart() {
 		const summaryUlList = this._findListRoot('.panel__summary');
 		this._clearListElements(summaryUlList);
-		cart.forEach((item) => {
+		this.cart.forEach((item) => {
 			const newSumLiItem = this._createSumListItem(item);
 			summaryUlList.appendChild(newSumLiItem);
 		});
-		this._setTotalOrderPrice(cart);
+		this._setTotalOrderPrice();
 	}
 
 	_createSumListItem(itemData) {
@@ -173,15 +198,15 @@
 		return [summaryName, summaryPrice, summaryDescription];
 	}
 
-	_setTotalOrderPrice(cart) {
+	_setTotalOrderPrice() {
 		const totalOrderPriceElement = this._getTotalOrderElementToUpdate();
-		const totalOrderPrice = this._getSummary(cart);
+		const totalOrderPrice = this._getSummary();
 		totalOrderPriceElement.innerText = `${totalOrderPrice}PLN`;
 	}
 
 	_getSummary(cart) {
 		let summary = 0;
-		cart.forEach((item) => {
+		this.cart.forEach((item) => {
 			summary +=
 				item.adultNumber * item.adultPrice + item.childNumber * item.childPrice;
 		});

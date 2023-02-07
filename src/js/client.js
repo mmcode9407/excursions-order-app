@@ -17,7 +17,7 @@ const init = () => {
 
 	clientExc.load();
 	clientOrders.addToCart();
-	// clientOrders.removeFromCart();
+	clientOrders.removeFromCart();
 	// submitOrder();
 };
 
