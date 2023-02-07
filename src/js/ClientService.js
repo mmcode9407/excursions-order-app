@@ -62,12 +62,28 @@
 		}
 	}
 
-	_getElementToRemove(targetEl) {
-		return targetEl.parentElement.parentElement;
+	submitOrder() {
+		const orderForm = document.querySelector('.panel__order');
+		orderForm.addEventListener('submit', (e) => this.handleSubmitOrder(e));
 	}
 
-	_filterCartById(idToRemove) {
-		this.cart = this.cart.filter((item) => item.id !== parseInt(idToRemove));
+	handleSubmitOrder(e) {
+		e.preventDefault();
+		const targetEl = e.target;
+		const fields = this._createFieldsToCheck();
+
+		if (this.cart.length !== 0) {
+			const errors = this._checkDataInForm(fields, targetEl);
+			if (errors.length === 0) {
+				this._addOrder(targetEl, fields);
+			} else {
+				this._createErrorsList(errors);
+			}
+		} else {
+			alert(
+				'Koszyk jest pusty! Aby dokonać zamówienia prosimy o dodanie wycieczki do koszyka.'
+			);
+		}
 	}
 
 	_findListRoot(className) {
@@ -204,7 +220,7 @@
 		totalOrderPriceElement.innerText = `${totalOrderPrice}PLN`;
 	}
 
-	_getSummary(cart) {
+	_getSummary() {
 		let summary = 0;
 		this.cart.forEach((item) => {
 			summary +=
@@ -216,5 +232,136 @@
 
 	_getTotalOrderElementToUpdate() {
 		return document.querySelector('.order__total-price-value');
+	}
+
+	_getElementToRemove(targetEl) {
+		return targetEl.parentElement.parentElement;
+	}
+
+	_filterCartById(idToRemove) {
+		this.cart = this.cart.filter((item) => item.id !== parseInt(idToRemove));
+	}
+
+	_createFieldsToCheck() {
+		return [
+			{
+				name: 'name',
+				label: 'Imię i Nazwisko',
+				required: true,
+				pattern: '[a-z]',
+			},
+			{
+				name: 'email',
+				label: 'Email',
+				required: true,
+				pattern: '[0-9a-z_.-]+@[0-9a-z.-]+.[a-z]{2,3}',
+			},
+		];
+	}
+
+	_checkDataInForm(dataArray, targetEl) {
+		let errors = [];
+		dataArray.forEach(function (dataEl) {
+			const { name, label, pattern = null, required = false } = dataEl;
+			const inputValue = targetEl.elements[name].value;
+
+			if (required) {
+				if (inputValue === '') {
+					errors.push(`Dane w polu ${label} są wymagane!`);
+				}
+			}
+
+			if (pattern) {
+				const reg = new RegExp(pattern);
+				if (!reg.test(inputValue)) {
+					errors.push(`Dane w polu ${label} nie są w odpowiednim formacie!`);
+				}
+			}
+		});
+
+		return errors;
+	}
+
+	_addOrder(targetEl, fields) {
+		const data = this._createDataToAdd(targetEl);
+
+		this.API_SERVICE.addData(data)
+			.catch((err) => console.error(err))
+			.finally(() => {
+				const errorsList = this._findListRoot('.order__field-errors');
+				this._clearListElements(errorsList);
+				this._showInfo(targetEl);
+				this._clearInputsValue(fields, targetEl);
+				this.cart = [];
+				this._renderCart();
+			});
+	}
+
+	_createDataToAdd(targetEl) {
+		const { name: participantName, email: participantEmail } =
+			targetEl.elements;
+
+		return {
+			participantName: participantName.value,
+			participantEmail: participantEmail.value,
+			orderDetails: this._getCartDataForAPI(),
+			orderDate: this._getOrderDate(),
+			orderTotalPrice: this._getTotalOrderElementToUpdate().textContent,
+		};
+	}
+
+	_clearInputsValue(arr, targetEl) {
+		arr.forEach(function (el) {
+			targetEl[el.name].value = '';
+		});
+	}
+
+	_showInfo(targetEl) {
+		const totalOrderPriceElement = this._getTotalOrderElementToUpdate();
+		const { email } = targetEl.elements;
+		alert(
+			`Dziękujemy za złożenie zamówienia o wartości ${totalOrderPriceElement.textContent}. Szczegóły zamówienia zostały wysłane na adres e-mail: ${email.value}.`
+		);
+	}
+
+	_getOrderDate() {
+		const date = new Date();
+
+		const orderDate = date
+			.toLocaleString('en-GB', {
+				day: '2-digit',
+				month: '2-digit',
+				year: 'numeric',
+				hour12: false,
+				hour: '2-digit',
+				minute: '2-digit',
+			})
+			.replace(',', '');
+
+		return orderDate;
+	}
+
+	_getCartDataForAPI() {
+		return this.cart.map((item) => {
+			const { adultNumber, childNumber, title, adultPrice, childPrice } = item;
+
+			return {
+				title: title,
+				adultNumber: adultNumber,
+				adultPrice: `${adultPrice}PLN`,
+				childNumber: childNumber,
+				childPrice: `${childPrice}PLN`,
+			};
+		});
+	}
+
+	_createErrorsList(errorsBox) {
+		const errorsList = this._findListRoot('.order__field-errors');
+		this._clearListElements(errorsList);
+		errorsBox.forEach(function (err) {
+			const liEl = document.createElement('li');
+			liEl.innerText = err;
+			errorsList.appendChild(liEl);
+		});
 	}
 }
