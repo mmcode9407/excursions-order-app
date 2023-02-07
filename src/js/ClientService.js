@@ -1,29 +1,13 @@
-﻿export default class ClientService {
-	constructor(API) {
-		this.API_SERVICE = API;
+﻿import Helper from './Helper';
+
+export default class ClientService extends Helper {
+	constructor(API_SERVICE) {
+		super(API_SERVICE);
 		this.cart = [];
 	}
 
-	load() {
-		this.API_SERVICE.loadData()
-			.then((data) => {
-				this.insertExcData(data);
-			})
-			.catch((err) => console.log(err));
-	}
-
-	insertExcData(excArray) {
-		const ulElement = this._findListRoot('.panel__excursions');
-		this._clearListElements(ulElement);
-		excArray.forEach((item) => {
-			const newLiItem = this._createExcListItem(item);
-
-			ulElement.appendChild(newLiItem);
-		});
-	}
-
 	addToCart() {
-		const ulElement = this._findListRoot('.panel__excursions');
+		const ulElement = super._findListRoot('.panel__excursions');
 		ulElement.addEventListener('submit', (e) => this.handleAddToCart(e));
 	}
 
@@ -44,7 +28,7 @@
 	}
 
 	removeFromCart() {
-		const summaryUlList = this._findListRoot('.panel__summary');
+		const summaryUlList = super._findListRoot('.panel__summary');
 		summaryUlList.addEventListener('click', (e) =>
 			this.handleRemoveFromCart(e)
 		);
@@ -86,78 +70,24 @@
 		}
 	}
 
-	_findListRoot(className) {
-		return document.querySelector(className);
-	}
-
-	_createExcListItem(itemData) {
-		const newLiItem = this._createElementFromProto(
-			'excursions__item--prototype'
-		);
-		const [title, description, adultPrice, childPrice] =
-			this._getExcItems(newLiItem);
-
-		title.innerText = itemData.name;
-		description.innerText = itemData.description;
-		adultPrice.innerText = itemData.adultPrice;
-		childPrice.innerText = itemData.childPrice;
-		newLiItem.dataset.id = itemData.id;
-
-		return newLiItem;
-	}
-
 	_isInputNaN(input) {
 		return isNaN(input.value);
-	}
-
-	_hasFieldValueLike(element, value) {
-		return element.value === value;
 	}
 
 	_areFieldsCorrect(targetEl) {
 		const [adultQTY, childQTY] = targetEl.elements;
 
 		return (
-			!this._hasFieldValueLike(adultQTY, '') &&
-			!this._hasFieldValueLike(childQTY, '') &&
+			!super._hasFieldValueLike(adultQTY, '') &&
+			!super._hasFieldValueLike(childQTY, '') &&
 			!this._isInputNaN(adultQTY) &&
 			!this._isInputNaN(childQTY)
 		);
 	}
 
-	_findPrototypeElementByClass(prototypeClassName) {
-		return document.querySelector(`.${prototypeClassName}`);
-	}
-
-	_createElementFromProto(prototypeClassName) {
-		const protoELement = this._findPrototypeElementByClass(prototypeClassName);
-		const newElement = protoELement.cloneNode(true);
-		newElement.classList.remove(prototypeClassName);
-
-		return newElement;
-	}
-
-	_getExcItems(root) {
-		const title = root.querySelector('.excursions__title');
-		const description = root.querySelector('.excursions__description');
-		const adultPrice = root.querySelector('.excursions__field-price--adult');
-		const childPrice = root.querySelector('.excursions__field-price--child');
-
-		return [title, description, adultPrice, childPrice];
-	}
-
-	_clearListElements(element) {
-		const listElementsAsArray = Array.from(element.children);
-		listElementsAsArray.forEach((item) => {
-			if (!item.className.includes('--prototype')) {
-				item.remove();
-			}
-		});
-	}
-
 	_getDataForCart(targetEl) {
 		const parentEl = targetEl.parentElement;
-		const [title, , adultPrice, childPrice] = this._getExcItems(parentEl);
+		const [title, , adultPrice, childPrice] = super._getExcItems(parentEl);
 		const [adultQTY, childQTY] = targetEl.elements;
 
 		return {
@@ -179,8 +109,8 @@
 	}
 
 	_renderCart() {
-		const summaryUlList = this._findListRoot('.panel__summary');
-		this._clearListElements(summaryUlList);
+		const summaryUlList = super._findListRoot('.panel__summary');
+		super._clearListElements(summaryUlList);
 		this.cart.forEach((item) => {
 			const newSumLiItem = this._createSumListItem(item);
 			summaryUlList.appendChild(newSumLiItem);
@@ -189,7 +119,7 @@
 	}
 
 	_createSumListItem(itemData) {
-		const newSumLiItem = this._createElementFromProto(
+		const newSumLiItem = super._createElementFromProto(
 			'summary__item--prototype'
 		);
 		const [summaryName, summaryPrice, summaryDescription] =
@@ -288,8 +218,8 @@
 		this.API_SERVICE.addData(data)
 			.catch((err) => console.error(err))
 			.finally(() => {
-				const errorsList = this._findListRoot('.order__field-errors');
-				this._clearListElements(errorsList);
+				const errorsList = super._findListRoot('.order__field-errors');
+				super._clearListElements(errorsList);
 				this._showInfo(targetEl);
 				this._clearInputsValue(fields, targetEl);
 				this.cart = [];
@@ -356,8 +286,8 @@
 	}
 
 	_createErrorsList(errorsBox) {
-		const errorsList = this._findListRoot('.order__field-errors');
-		this._clearListElements(errorsList);
+		const errorsList = super._findListRoot('.order__field-errors');
+		super._clearListElements(errorsList);
 		errorsBox.forEach(function (err) {
 			const liEl = document.createElement('li');
 			liEl.innerText = err;
