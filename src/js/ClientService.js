@@ -32,15 +32,9 @@
 	handleAddToCart(e, cart) {
 		e.preventDefault();
 		const targetEl = e.target;
-		const [adultQTY, childQTY] = targetEl.elements;
 
-		if (
-			!this._isEmptyInput(adultQTY) &&
-			!this._isEmptyInput(childQTY) &&
-			!this._isInputNaN(adultQTY) &&
-			!this._isInputNaN(childQTY)
-		) {
-			const basketData = this._getDataForCart(targetEl);
+		if (this._areFieldsCorrect(targetEl)) {
+			const basketData = this._getDataForCart(targetEl, cart);
 
 			cart.push(basketData);
 
@@ -71,6 +65,25 @@
 		return newLiItem;
 	}
 
+	_isInputNaN(input) {
+		return isNaN(input.value);
+	}
+
+	_hasFieldValueLike(element, value) {
+		return element.value === value;
+	}
+
+	_areFieldsCorrect(targetEl) {
+		const [adultQTY, childQTY] = targetEl.elements;
+
+		return (
+			!this._hasFieldValueLike(adultQTY, '') &&
+			!this._hasFieldValueLike(childQTY, '') &&
+			!this._isInputNaN(adultQTY) &&
+			!this._isInputNaN(childQTY)
+		);
+	}
+
 	_findPrototypeElementByClass(prototypeClassName) {
 		return document.querySelector(`.${prototypeClassName}`);
 	}
@@ -93,22 +106,15 @@
 	}
 
 	_clearListElements(element) {
-		for (const el of element.children) {
-			if (!el.className.includes('--prototype')) {
-				el.remove();
+		const listElementsAsArray = Array.from(element.children);
+		listElementsAsArray.forEach((item) => {
+			if (!item.className.includes('--prototype')) {
+				item.remove();
 			}
-		}
+		});
 	}
 
-	_isEmptyInput(input) {
-		return input.value === '';
-	}
-
-	_isInputNaN(input) {
-		return isNaN(input.value);
-	}
-
-	_getDataForCart(targetEl) {
+	_getDataForCart(targetEl, cart) {
 		const parentEl = targetEl.parentElement;
 		const [title, , adultPrice, childPrice] = this._getExcItems(parentEl);
 		const [adultQTY, childQTY] = targetEl.elements;
@@ -119,7 +125,7 @@
 			adultPrice: adultPrice.textContent,
 			childNumber: childQTY.value,
 			childPrice: childPrice.textContent,
-			id: this._getMaxId(this.cart),
+			id: this._getMaxId(cart),
 		};
 	}
 
@@ -138,7 +144,7 @@
 			const newSumLiItem = this._createSumListItem(item);
 			summaryUlList.appendChild(newSumLiItem);
 		});
-		this._setTotalOrderPrice();
+		this._setTotalOrderPrice(cart);
 	}
 
 	_createSumListItem(itemData) {
@@ -167,9 +173,9 @@
 		return [summaryName, summaryPrice, summaryDescription];
 	}
 
-	_setTotalOrderPrice() {
+	_setTotalOrderPrice(cart) {
 		const totalOrderPriceElement = this._getTotalOrderElementToUpdate();
-		const totalOrderPrice = this._getSummary(this.cart);
+		const totalOrderPrice = this._getSummary(cart);
 		totalOrderPriceElement.innerText = `${totalOrderPrice}PLN`;
 	}
 
