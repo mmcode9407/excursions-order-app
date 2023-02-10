@@ -1,6 +1,6 @@
-﻿import Helper from './Helper';
+﻿import Service from './Service';
 
-export default class AdminService extends Helper {
+export default class AdminService extends Service {
 	constructor(API_SERVICE) {
 		super(API_SERVICE);
 	}

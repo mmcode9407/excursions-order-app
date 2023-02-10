@@ -1,4 +1,4 @@
-﻿export default class Helper {
+﻿export default class Service {
 	constructor(API) {
 		this.API_SERVICE = API;
 	}
